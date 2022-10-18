@@ -15,3 +15,5 @@ Nous avons, pour nous accompagner dans ce projet 4 fichiers Excel (source de don
 
 documentation fonctionnelle sous forme de docx permet de mieux comprendre le fonctionnement de l'appication shiny
 documentation technique sous forme de docx permet de mieux comprendre l'utilisation du code r
+
+MCD.png = image du modèle conceptuel de données
