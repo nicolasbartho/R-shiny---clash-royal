@@ -1,0 +1,146 @@
+---
+title: "Projet R"
+author: "Axel Giraud et Nicolas Barthollet"
+date: '2022-10-11'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problématique
+
+Dans quelle mesure les statistiques peuvent nous aider à jouer au jeu vidéo, Clash Royal ?
+
+
+
+## Sommaire
+
+Partie 1:
+Presentation du jeu de données
+Partie 2:
+Description et Compréhension approfondie du jeu
+Partie 3:
+Comment s'améliorer sur le jeu à l'aide des statistiques
+
+
+## Introduction
+
+Clash Royale est un jeu vidéo mobile développé et édité par Supercell, sorti le 2 mars 2016 sur iOS et Android. Il s'agit d'un jeu se basant sur des duels multijoueurs en temps réel, avec un système de cartes à collectionner.
+
+##Partie 1
+
+###Présentation du jeu de données
+Notre jeu de données se décompose en 3 tables. 
+La première est la table "ranking" qui comporte des données sur les 200 meilleurs joueurs de chaque pays. On y retrouve l'identifiant des joueurs, leurs pays, leurs pseudos,leurs niveaux d'experiences, leurs rangs mondiaux et leurs rangs dans leurs pays respectifs ainsi que leurs nombres de trophées et leurs arènes. 
+Dans la deuxième table "match", on retrouve l'identifiant du match, le gagnant, ainsi que le tag, le nombre de tours détruites et  les 8 cartes qui composent le deck de chaque joueur.
+La troisème table "type_troupe" comporte le nom de la troupe qui de clé prmiaire, la rareté, le type et le cout en elixir de la carte.
+
+
+## Partie 2
+
+
+###Le jeu
+Tout d'abord, le jeu se base sur une succession de duels multijoueur en temps réel. Chaque joueur prépare un ou plusieurs deck de 8 cartes chacune sur un choix de plus de 100 cartes, qu'il sélectionne et peut modifier entre chaque partie. Lors d'un match, seules les 8 cartes du deck sélectionné peuvent être jouées grâce à de l'élixir généré au fil du match.                                                                       Le but du jeu est de détruire les tours adverses en premier dans le temps imparti. La partie est gagnée immédiatement par un joueur lorsqu'il détruit la tour du roi adverse, ou bien à la fin du temps de jeu par le joueur ayant détruit le plus de tours. En cas de victoire, le joueur obtient des trophées pour améliorer son classement ainsi qu’un coffre de cartes. Au contraire, le joueur perd des trophées en cas de défaite et n'obtient aucun coffre. 
+ 
+ 
+###Les égalités
+En cas d'égalité à la fin du temps réglementaire (d’une durée de 3 minutes), une prolongation en « mort-subite » permet de départager les joueurs. C’est-à-dire que le premier joueur qui perd une tour, perd le match. Si les joueurs ne sont toujours pas départagés, le dernier recours est le « tie-breaker » où les points de vie des tours baissent jusqu'au moment où la tour la plus basse en points de vie après le combat tombe et provoque la victoire de l'adversaire. Si le même nombre de tours sont détruite à la fin du tie-breaker alors la partie se soldera par une égalité.
+
+
+###Classement
+Le système de classement se base sur les trophées des joueurs, ceux-ci sont répartis par niveaux dans des arènes et dans des ligues. Les parties sont équilibrées par un algorithme de matchmaking qui sélectionne des joueurs avec un nombre de trophées proches.                                                                                           Il y a 15 arènes (la première débute à 0 trophées et la dernière à 5000 trophées) et 10 ligues (la première débute à 5000 trophées et la dernière à 8000 trophées) accessibles en fonction du nombre de trophées possédés. L'arène 15 correspond au début des ligues. Chaque arène permet de débloquer de nouvelles cartes qui pourront être trouvées dans les prochains coffres. Comme on peut le voir dans le graphique ci-dessous, dans certains pays, nous avons peu de joueurs et donc nous avons des joueurs mal classés qui figurent dans nos données.
+```{r}
+library(readxl)
+hist(ranking$trophies)
+ranking <- read_excel("ranking.xlsx")
+ranking$repar_tr <- cut(x = ranking$trophies, breaks = c(min(ranking$trophies),1000,4000,5000,max(ranking$trophies)), include.lowest =  TRUE)
+table(ranking$repar_tr)
+```
+
+
+###L'expérience
+Chaque joueur a aussi un niveau d'expérience, qui augmente avec les améliorations et lorsque le joueur fait des combats. La progression au fil des niveaux est de plus en plus lente. Le niveau d'expérience maximum est de 13. Les points de vie des tours sont définis en fonction du niveau. Ce qui signifie que plus j’ai un fort niveau d’expérience et plus mes tours ont de point de vie.  Cette situation se retranscrit dans le graphique ci-dessous. 
+```{r}
+#Graphique 1 -Experience
+library(readxl)
+boxplot(formula = ranking$trophies ~ ranking$expLevel, main = "Distribution des trophées en fonction du niveau d'experience",  horizontal = FALSE)
+```
+Ainsi, le jeu est basé sur le fait que même un bon débutant perdra des matchs car il n'a pas un niveau d'experience assez élevé et cela le pénlisera de manière conséquente. 
+
+
+###Les récompenses
+Lorsque l’on remporte une partie, on gagne un coffre qui contient des cartes à collectionner pour améliorer son jeu, de l'or pour acheter des cartes ou améliorer ses cartes. Le contenu des coffres en or et en cartes augmente en fonction de l'arène. 
+
+
+###L'élixir 
+Une des choses importantes pour remporter la partie est la gestion de l’élixir. Il est généré à la vitesse d’1 élixir toutes les 4 secondes les deux premières minutes, puis 2 élixirs la troisième et dernière minute du temps réglementaire ainsi que la première minute de la « mort-subite ». Puis 3 élixirs toutes les 4 secondes lors de la fin de la « mort-subite ». La jauge maximale est de 10 élixirs pour un joueur.
+Le joeur compose son deck pour avoir un coût moyen en elixir compris entre 3 et 4 pour que le deck soit viable.
+```{r}
+library(readxl)
+type_troupe <- read_excel("type_troupe.xlsx")
+mean(type_troupe$elixir)
+hist(x = type_troupe$elixir, breaks = 10)
+```
+
+
+
+## Partie 3
+
+Maintenant que nous connaissons toutes les composantes d'une partie nous allons analyser comment mieux jouer grâce aux statistiques
+
+
+###Les cartes
+
+Une chose essentielle pour gagner une partie est d'avoir un bon deck composé de bonnes cartes.
+Mais lesquelles choisir pour optimiser nos chances de victoires ?
+Au premier abord, on pourrait avoir envie de selectionner un maximum de cartes de rareté légendaires. 
+En effet, ce sont des cartes compliqués à débloquer et elles sont moisn présentes dans le jeu comme on peut l'observer sur ce graphique.
+```{r}
+#Graphique 2
+library(readxl)
+Ax<-table(type_troupe$rarity)
+barplot(height = Ax, main = 'Répartition des cartes par rareté', las= 2, cex.names = 1)
+```
+Cependant, les cartes légendaires ne sont pas forcément  plus fortes, elles ont "juste" des mécanques de jeu différentes des autres, ce qui les rend plus amusantes à jouer.
+La rareté des cartes n'intervient pas aussi dans le coût en elixir comme on peut le voir dans le graphique ci-dessous.
+```{r}
+library(readxl)
+type_troupe <- read_excel("type_troupe.xlsx")
+boxplot(formula = type_troupe$elixir ~ type_troupe$rarity, main = "elixir par rareté",  horizontal = FALSE)
+```
+
+Un bon deck doit aussi comporter différents type de cartes. On en recense trois types principaux et on peut observer leur répartition dans le graphique ci-dessous.
+```{r}
+type_troupe <- read_excel("type_troupe.xlsx")
+type<-table(type_troupe$type)
+pie(x=type)
+sort(type)
+```
+Les troupes sont des personnages fictifs qui peuvent se déplacer dans l'arène. Les batiments sont inamovibles mais peuevnt invoquer des troupes ou faire des dégats tant qu'ils ne sont pas détruits. Les sorts sont des cartes dont l'effet est immédiat sur les troupes et les tours et sont inévitables. Cependant un deck rempli seuelement de sorts  ne fonctionneraient pas car leur effet dans le temps est limité et ils ne peuvent pas détruire toutes les troupes. 
+
+###La stratégie 
+Choisir un deck est une chose mais il faut ensuite le jouer lors de la partie. Pour mieux jouer, l'experience est essetielle pour assimiler certains principes de jeu. Cependant, faut-il mieux privilégier la défense de ses tours pour ne pas perdre ou attaquer les tours adverses pour gagner.  Bien entendu, l'idéal est de réussir les deux mais laquelle privilégier ?
+ C'est la question que nous nous sommes posés et il s'est avéré qu'il valait mieux défendre d'abord.
+```{r}
+library(readxl)
+type_troupe <- read_excel("ranking.xlsx")
+M<-sum(match$crownsEarned_P1)
+N<-sum(match$crownsEarned_P2)
+Moyenne<-((N+M)/(2*301))
+Moyenne
+```
+En effet lorsqu'on voit ses chiffres, avec une moyenne de 0, 86 tours détruites par joueur par match alors la défense doit plutît etre favorisée. 
+
+###Les limites des statistiques
+Malgré tout ce que nous avons dit, il n'y a pas de solutions miracles pour gagner une partie et m^^eme les statistiques ne peuevent pas nous aider tout le temps et surtout la méta étant très évolutive alors ce qui est vrai aujourdhui ne le sera pas demain. De plus, il est compliqué de tout prendre en compte, nous n'avons pas pris en compte la notion de jeu aérien/ au sol ici alors que c'est une composante essentielle du jeu mais très compliqué à analyser.
+
+##Conclusion
+ Les statistiques peuvent nous aider à comprendre de nombreux points surtout lorsqu'on débute au jeu mais elles touchent certaines limites assez rapidement. 
+
+
+
+
+
+
