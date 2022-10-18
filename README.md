@@ -11,7 +11,7 @@ Nous avons, pour nous accompagner dans ce projet 3 fichiers Excel (source de don
   ranking.xlsx <- données classement des joueurs
   match.xlsx   <- données des matchs des joueurs
   type.troupes.xlsx <- données des cartes présentes dans le jeu
-
+Ces 3 fichiers sont les données brutes que nous avons récoltés (sur Kaggle), nous n'avons pas effectué de modifications
 documentation fonctionnelle sous forme de docx permet de mieux comprendre le fonctionnement de l'appication shiny
 documentation technique sous forme de docx permet de mieux comprendre l'utilisation du code r
 
