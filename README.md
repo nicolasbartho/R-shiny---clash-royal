@@ -10,5 +10,5 @@ Nous avons, pour nous accompagner dans ce projet 4 fichiers Excel (source de don
   match.xlsx   <- données des matchs des joueurs
   type.troupes.xlsx <- données des cartes présentes dans le jeu
 
-documentation fonctionnelle sous forme de docx
+documentation fonctionnelle sous forme de docx permet de mieux comprendre le fonctionnement de l'appication shiny
 documentation technique sous forme de docx permet de mieux comprendre l'utilisation du code r
