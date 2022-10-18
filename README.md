@@ -4,8 +4,8 @@ Projet R shiny de Barthollet Nicolas et Giraud Axel
 L'application est disponible sur shinyapps.io
 URL : https://projet-r-shiny-barthollet-giraud.shinyapps.io/clash_royal_app/
 
-clahs_royal.R  correspond au fichier shiny permettant l'ouverture de l'application
-R markdown correspond au fichier markdown permettant de comprendre l'enjeux de l'étude des données et de pouvoir s'informer sur ces données avant d'ouvrir l'application shiny
+clahs_royal.R <- correspond au fichier shiny permettant l'ouverture de l'application
+Projet R.Rmd <- correspond au fichier markdown permettant de comprendre l'enjeux de l'étude des données et de pouvoir s'informer sur ces données avant d'ouvrir l'application shiny
 
 Nous avons, pour nous accompagner dans ce projet 4 fichiers Excel (source de données):
   ranking.xlsx <- données classement des joueurs
